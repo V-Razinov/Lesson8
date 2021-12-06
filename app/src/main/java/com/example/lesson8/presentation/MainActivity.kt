@@ -11,7 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.lesson8.data.PetEntity
+import com.example.lesson8.data.entity.PersonEntity
+import com.example.lesson8.data.entity.PetEntity
 import com.example.lesson8.databinding.ActivityMainBinding
 import com.example.lesson8.databinding.DialogAddPersonBinding
 import kotlinx.coroutines.*
@@ -32,17 +33,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.rv.layoutManager = LinearLayoutManager(applicationContext)
         binding.rv.adapter = adapter
-        binding.sw.setOnRefreshListener { viewModel.onRefresh() }
-        binding.fab.setOnClickListener { viewModel.onFabClick() }
+        binding.sw.setOnRefreshListener { viewModel.refresh() }
+        binding.fab.setOnClickListener { viewModel.showAddDialog() }
 
         viewModel.persons.observe(this, adapter::submitList)
         viewModel.isRefreshing.observe(this, binding.sw::setRefreshing)
         viewModel.event.observe(this, ::handleEvent)
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.onRefresh()
+    override fun onStart() {
+        super.onStart()
+        viewModel.refresh()
     }
 
     private fun handleEvent(
@@ -80,7 +81,8 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Добавление")
             .setPositiveButton("Добавить") { _, _ ->
                 val pet = b.pet.selectedItem as? PetEntity ?: return@setPositiveButton
-                viewModel.savePerson(b.personName.text.toString(), pet)
+                val personName = b.personName.text?.toString() ?: return@setPositiveButton
+                viewModel.savePerson(PersonEntity(name = personName, pet = pet))
             }
             .setNegativeButton("Отмена") { _, _ ->  }
             .show()

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.lesson8.data.PersonEntity
+import com.example.lesson8.data.entity.PersonEntity
 import com.example.lesson8.databinding.ItemPersonBinding
 
 class PersonsAdapter(
@@ -38,10 +38,10 @@ class PersonsAdapter(
         private val onDelete: (PersonEntity) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(person: PersonEntity) {
-            binding.personName.text = person.name
-            binding.petName.text = person.pet.name
-            binding.root.setOnLongClickListener { onDelete(person); true }
+        fun bind(person: PersonEntity) = with(binding) {
+            personName.text = person.name
+            petName.text = person.pet.name
+            root.setOnLongClickListener { onDelete(person); true }
         }
     }
 }
