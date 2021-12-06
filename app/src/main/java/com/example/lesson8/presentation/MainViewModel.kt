@@ -23,24 +23,24 @@ class MainViewModel: ViewModel() {
         scope.cancel()
     }
 
-    fun onRefresh() {
+    fun refresh() {
         scope.launch {
             persons.value = withContext(Dispatchers.IO) { dbRepository.readPersons() }
             isRefreshing.value = false
         }
     }
 
-    fun onFabClick() {
+    fun showAddDialog() {
         scope.launch {
             val pets = withContext(Dispatchers.IO) { dbRepository.readPets() }
             event.value = Event.ShowDialog(pets = pets)
         }
     }
 
-    fun savePerson(personName: String, pet: PetEntity) {
+    fun savePerson(person: PersonEntity) {
         scope.launch {
             persons.value = withContext(Dispatchers.IO) {
-                dbRepository.insertPersons(PersonEntity(name = personName, pet = pet))
+                dbRepository.insertPersons(person)
                 dbRepository.readPersons()
             }
         }

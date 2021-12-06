@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.lesson8.data.PersonEntity
 import com.example.lesson8.data.PetEntity
 import com.example.lesson8.databinding.ActivityMainBinding
 import com.example.lesson8.databinding.DialogAddPersonBinding
@@ -32,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.rv.layoutManager = LinearLayoutManager(applicationContext)
         binding.rv.adapter = adapter
-        binding.sw.setOnRefreshListener { viewModel.onRefresh() }
-        binding.fab.setOnClickListener { viewModel.onFabClick() }
+        binding.sw.setOnRefreshListener { viewModel.refresh() }
+        binding.fab.setOnClickListener { viewModel.showAddDialog() }
 
         viewModel.persons.observe(this, adapter::submitList)
         viewModel.isRefreshing.observe(this, binding.sw::setRefreshing)
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.onRefresh()
+        viewModel.refresh()
     }
 
     private fun handleEvent(
@@ -57,14 +58,19 @@ class MainActivity : AppCompatActivity() {
             personName.doAfterTextChanged {
                 dialog!!
                     .getButton(AlertDialog.BUTTON_POSITIVE)
-                    .isEnabled = !it.isNullOrBlank() && pet.selectedItem != null
+                    .isEnabled = !it.isNullOrBlank() && !personAge.text.isNullOrBlank() && pet.selectedItem != null
+            }
+            personAge.doAfterTextChanged {
+                dialog!!
+                    .getButton(AlertDialog.BUTTON_POSITIVE)
+                    .isEnabled = !personName.text.isNullOrEmpty() && !it.isNullOrBlank() && pet.selectedItem != null
             }
             pet.adapter = getDialogSpinnerAdapter(pets)
             pet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     dialog!!
                         .getButton(AlertDialog.BUTTON_POSITIVE)
-                        .isEnabled = personName.text.isNotBlank()
+                        .isEnabled = personName.text.isNotBlank() && personAge.text.isNotBlank()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -80,7 +86,9 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Добавление")
             .setPositiveButton("Добавить") { _, _ ->
                 val pet = b.pet.selectedItem as? PetEntity ?: return@setPositiveButton
-                viewModel.savePerson(b.personName.text.toString(), pet)
+                val personName = b.personName.text?.toString() ?: return@setPositiveButton
+                val personAge = b.personAge.text?.toString()?.toIntOrNull() ?: return@setPositiveButton
+                viewModel.savePerson(PersonEntity(name = personName, age = personAge, pet = pet))
             }
             .setNegativeButton("Отмена") { _, _ ->  }
             .show()

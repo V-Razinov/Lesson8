@@ -4,8 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.provider.BaseColumns
 import androidx.core.database.sqlite.transaction
-import com.example.lesson8.MyDbContract
-import com.example.lesson8.SqlDbHelper
 
 class DbRepository(context: Context) {
 
@@ -17,6 +15,7 @@ class DbRepository(context: Context) {
             persons.forEach { person ->
                 values.put(MyDbContract.TablePersons.COLUMN_NAME, person.name)
                 values.put(MyDbContract.TablePersons.COLUMN_PET, person.pet.id)
+                values.put(MyDbContract.TablePersons.COLUMN_AGE, person.age)
                 insert(MyDbContract.TablePersons.NAME, null, values)
             }
         }
@@ -26,6 +25,7 @@ class DbRepository(context: Context) {
         db.writableDatabase.transaction {
             val values = ContentValues().apply {
                 put(MyDbContract.TablePersons.COLUMN_NAME, person.name)
+                put(MyDbContract.TablePersons.COLUMN_AGE, person.age)
                 put(MyDbContract.TablePersons.COLUMN_PET, person.id)
             }
             update(
@@ -50,12 +50,14 @@ class DbRepository(context: Context) {
     fun readPersons(): List<PersonEntity> {
         val personId = "person_id"
         val personName = "person_name"
+        val personAge = "person_age"
         val petId = "pet_id"
         val petName = "pet_name"
         return db.readableDatabase.rawQuery(
             "SELECT " +
                     "${MyDbContract.TablePersons.NAME}.${BaseColumns._ID} as $personId, " +
                     "${MyDbContract.TablePersons.NAME}.${MyDbContract.TablePersons.COLUMN_NAME} as $personName, " +
+                    "${MyDbContract.TablePersons.NAME}.${MyDbContract.TablePersons.COLUMN_AGE} as $personAge, " +
                     "${MyDbContract.TablePets.NAME}.${BaseColumns._ID} as $petId, " +
                     "${MyDbContract.TablePets.NAME}.${MyDbContract.TablePets.COLUMN_NAME} as $petName " +
                 "FROM ${MyDbContract.TablePersons.NAME} " +
@@ -70,6 +72,7 @@ class DbRepository(context: Context) {
                         PersonEntity(
                             id = cursor.getInt(cursor.getColumnIndexOrThrow(personId)),
                             name = cursor.getString(cursor.getColumnIndexOrThrow(personName)),
+                            age = cursor.getInt(cursor.getColumnIndexOrThrow(personAge)),
                             pet = PetEntity(
                                 id = cursor.getInt(cursor.getColumnIndexOrThrow(petId)),
                                 name = cursor.getString(cursor.getColumnIndexOrThrow(petName))
@@ -123,6 +126,7 @@ class DbRepository(context: Context) {
 data class PersonEntity(
     val id: Int = -1,
     val name: String,
+    val age: Int, //added in db_version 2
     val pet: PetEntity
 )
 

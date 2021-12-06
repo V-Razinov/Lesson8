@@ -2,6 +2,7 @@ package com.example.lesson8.presentation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lesson8.data.PersonEntity
@@ -39,7 +40,10 @@ class PersonsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(person: PersonEntity) {
+            val age = if (person.age >= 0) person.age.toString() else ""
             binding.personName.text = person.name
+            binding.personAge.text = age
+            binding.personAge.isVisible = age.isNotEmpty()
             binding.petName.text = person.pet.name
             binding.root.setOnLongClickListener { onDelete(person); true }
         }
