@@ -58,14 +58,19 @@ class MainActivity : AppCompatActivity() {
             personName.doAfterTextChanged {
                 dialog!!
                     .getButton(AlertDialog.BUTTON_POSITIVE)
-                    .isEnabled = !it.isNullOrBlank() && pet.selectedItem != null
+                    .isEnabled = !it.isNullOrBlank() && !personAge.text.isNullOrBlank() && pet.selectedItem != null
+            }
+            personAge.doAfterTextChanged {
+                dialog!!
+                    .getButton(AlertDialog.BUTTON_POSITIVE)
+                    .isEnabled = !personName.text.isNullOrEmpty() && !it.isNullOrBlank() && pet.selectedItem != null
             }
             pet.adapter = getDialogSpinnerAdapter(pets)
             pet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     dialog!!
                         .getButton(AlertDialog.BUTTON_POSITIVE)
-                        .isEnabled = personName.text.isNotBlank()
+                        .isEnabled = personName.text.isNotBlank() && personAge.text.isNotBlank()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -82,7 +87,8 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Добавить") { _, _ ->
                 val pet = b.pet.selectedItem as? PetEntity ?: return@setPositiveButton
                 val personName = b.personName.text?.toString() ?: return@setPositiveButton
-                viewModel.savePerson(PersonEntity(name = personName, pet = pet))
+                val personAge = b.personAge.text?.toString()?.toIntOrNull() ?: return@setPositiveButton
+                viewModel.savePerson(PersonEntity(name = personName, age = personAge, pet = pet))
             }
             .setNegativeButton("Отмена") { _, _ ->  }
             .show()

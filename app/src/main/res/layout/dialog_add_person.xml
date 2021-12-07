@@ -12,6 +12,12 @@
         android:layout_height="wrap_content"
         android:hint="Имя" />
 
+    <EditText
+        android:id="@+id/person_age"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Возраст" />
+
     <Spinner
         android:id="@+id/pet"
         android:layout_width="match_parent"

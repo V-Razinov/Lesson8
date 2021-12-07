@@ -7,5 +7,5 @@ import com.example.lesson8.data.MyDbContract
 @Entity(tableName = MyDbContract.TablePets.NAME)
 data class PetEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    val name: String
+    val name: String,
 )

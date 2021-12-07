@@ -9,6 +9,7 @@ import com.example.lesson8.data.MyDbContract
 data class PersonEntity(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val name: String,
+    val age: Int,
     @Embedded(prefix = "pet")
     val pet: PetEntity
 )
