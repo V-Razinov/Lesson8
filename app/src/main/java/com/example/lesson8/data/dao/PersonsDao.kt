@@ -1,5 +1,6 @@
 package com.example.lesson8.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.lesson8.data.MyDbContract
 import com.example.lesson8.data.entity.PersonEntity
@@ -13,7 +14,7 @@ interface PersonsDao {
     fun insertAll(list: PersonEntity)
 
     @Query("SELECT * FROM ${MyDbContract.TablePersons.NAME}")
-    fun readAll() : List<PersonEntity>
+    fun readAll() : LiveData<List<PersonEntity>>
 
     @Delete
     fun delete(personEntity: PersonEntity)

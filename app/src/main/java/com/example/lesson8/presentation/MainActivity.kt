@@ -33,17 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.rv.layoutManager = LinearLayoutManager(applicationContext)
         binding.rv.adapter = adapter
-        binding.sw.setOnRefreshListener { viewModel.refresh() }
         binding.fab.setOnClickListener { viewModel.showAddDialog() }
 
         viewModel.persons.observe(this, adapter::submitList)
-        viewModel.isRefreshing.observe(this, binding.sw::setRefreshing)
         viewModel.event.observe(this, ::handleEvent)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.refresh()
     }
 
     private fun handleEvent(

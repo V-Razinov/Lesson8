@@ -10,9 +10,8 @@ import com.example.lesson8.data.dao.PersonsDao
 import com.example.lesson8.data.dao.PetsDao
 import com.example.lesson8.data.entity.PersonEntity
 import com.example.lesson8.data.entity.PetEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 @Database(
@@ -27,6 +26,7 @@ abstract class MyDb : RoomDatabase() {
 
     companion object {
         private var INSTANCE: MyDb? = null
+        var callbackOnCreateJob: Job? = null
 
         fun getInstance(context: Context, scope: CoroutineScope): MyDb {
             return INSTANCE ?: synchronized(this) {
@@ -59,7 +59,7 @@ abstract class MyDb : RoomDatabase() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             INSTANCE?.let { instance ->
-                scope.launch(Dispatchers.IO) {
+                callbackOnCreateJob = scope.launch(Dispatchers.IO) {
                     val pets = listOf(
                         PetEntity(name = "Кошак"),
                         PetEntity(name = "Собак"),

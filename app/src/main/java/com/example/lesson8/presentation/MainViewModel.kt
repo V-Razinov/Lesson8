@@ -1,5 +1,6 @@
 package com.example.lesson8.presentation
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.lesson8.App
@@ -9,10 +10,10 @@ import com.example.lesson8.data.entity.PetEntity
 import com.example.lesson8.other.SingleLiveEvent
 import kotlinx.coroutines.*
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
-    val isRefreshing = MutableLiveData(false)
-    val persons = MutableLiveData<List<PersonEntity>>()
+    val persons: LiveData<List<PersonEntity>>
+        get() = db.personDao().readAll()
     val event = SingleLiveEvent<Event>()
 
     private val scope = CoroutineScope(Job() + Dispatchers.Main.immediate)
@@ -23,14 +24,6 @@ class MainViewModel: ViewModel() {
         scope.cancel()
     }
 
-    fun refresh() {
-        scope.launch {
-            delay(100)
-            persons.value = withContext(Dispatchers.IO) { db.personDao().readAll() }
-            isRefreshing.value = false
-        }
-    }
-
     fun showAddDialog() {
         scope.launch {
             val pets = withContext(Dispatchers.IO) { db.petsDao().readAll() }
@@ -39,21 +32,11 @@ class MainViewModel: ViewModel() {
     }
 
     fun savePerson(person: PersonEntity) {
-        scope.launch {
-            persons.value = withContext(Dispatchers.IO) {
-                db.personDao().insertAll(person)
-                db.personDao().readAll()
-            }
-        }
+        scope.launch(Dispatchers.IO) { db.personDao().insertAll(person) }
     }
 
     fun deletePerson(person: PersonEntity) {
-        scope.launch {
-            persons.value = withContext(Dispatchers.IO) {
-                db.personDao().delete(person)
-                db.personDao().readAll()
-            }
-        }
+        scope.launch(Dispatchers.IO) { db.personDao().delete(person) }
     }
 
     sealed class Event {
